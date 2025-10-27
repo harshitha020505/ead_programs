@@ -1,0 +1,81 @@
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { sortAsc, sortDesc } from './studentsSlice';
+
+export default function App() {
+  const students = useSelector(state => state.students.list);
+  const dispatch = useDispatch();
+
+  return (
+    <div style={{ maxWidth: '400px', margin: '50px auto', fontFamily: 'Arial' }}>
+      <h2>Student List</h2>
+      <div style={{ marginBottom: '10px' }}>
+        <button onClick={() => dispatch(sortAsc())} style={{ marginRight: '5px' }}>Sort Ascending</button>
+        <button onClick={() => dispatch(sortDesc())}>Sort Descending</button>
+      </div>
+      <table border="1" width="100%" cellPadding="5">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Marks</th>
+          </tr>
+        </thead>
+        <tbody>
+          {students.map((s, i) => (
+            <tr key={i}>
+              <td>{s.name}</td>
+              <td>{s.marks}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+} app.jsx
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+  list: [
+    { name: "John Doe", marks: 85 },
+    { name: "Jane Smith", marks: 92 },
+    { name: "Bob Johnson", marks: 78 },
+    { name: "Alice Brown", marks: 95 },
+    { name: "Charlie Wilson", marks: 88 },
+  ]
+};
+
+const studentsSlice = createSlice({
+  name: 'students',
+  initialState,
+  reducers: {
+    sortAsc: (state) => {
+      state.list.sort((a, b) => a.marks - b.marks);
+    },
+    sortDesc: (state) => {
+      state.list.sort((a, b) => b.marks - a.marks);
+    }
+  }
+});
+
+export const { sortAsc, sortDesc } = studentsSlice.actions;
+export default studentsSlice.reducer; studentSlice.jsx
+import { configureStore } from '@reduxjs/toolkit';
+import studentsReducer from './studentsSlice';
+
+export const store = configureStore({
+  reducer: {
+    students: studentsReducer
+  }
+});
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import { Provider } from 'react-redux';
+import { store } from './store';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <Provider store={store}>
+    <App />
+  </Provider>
+); main.jsx
