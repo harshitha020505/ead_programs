@@ -1,0 +1,67 @@
+import React, { useState } from "react";
+
+export default function App() {
+  const [info, setInfo] = useState("");
+  const [status, setStatus] = useState("");
+
+  const fetchInfo = async () => {
+    const res = await fetch("http://localhost:3004/info");
+    const data = await res.json();
+    setInfo(data.message);
+  };
+
+  const fetchStatus = async () => {
+    const res = await fetch("http://localhost:3004/status");
+    const data = await res.json();
+    setStatus(Status: ${data.status} | Time: ${data.timestamp});
+  };
+
+  return (
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
+      <h2>Info & Status Viewer</h2>
+      <button onClick={fetchInfo}>Get Info</button>
+      <button onClick={fetchStatus} style={{ marginLeft: "10px" }}>
+        Get Status
+      </button>
+
+      <div style={{ marginTop: "20px" }}>
+        <h3>{info}</h3>
+        <h4>{status}</h4>
+      </div>
+    </div>
+  );
+}
+const express = require("express");
+const cors = require("cors");
+const app = express();
+const PORT = 3004;
+
+// ✅ Enable CORS
+app.use(cors({
+  origin: "http://localhost:3001", // or 3001 if your React app runs there
+  methods: ["GET"]
+}));
+
+// Logger middleware
+app.use((req, res, next) => {
+  const ts = new Date().toISOString();
+  console.log([${ts}] ${req.method} ${req.originalUrl});
+  next();
+});
+
+// Info route
+app.get("/info", (req, res) => {
+  res.json({ message: "Server Information Route Accessed" });
+});
+
+// Status route
+app.get("/status", (req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Not Found", path: req.originalUrl });
+});
+
+app.listen(PORT, () => console.log(✅ Server listening on http://localhost:${PORT}));
